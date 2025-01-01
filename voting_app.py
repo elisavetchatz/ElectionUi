@@ -9,8 +9,14 @@ class VotingApp:
 
         # Αρχικοποίηση δεδομένων
         self.participants = 20
-        self.plates = [f"Plate {i+1}" for i in range(20)]
-        self.scores = {plate: 0 for plate in self.plates}
+        self.participant_data = {
+            "Μαρία": "Βασιλόπιτα", "Γιώργος": "Παστίτσιο", "Ελένη": "Μουσακάς", "Νίκος": "Σουβλάκι",
+            "Κατερίνα": "Ντολμαδάκια", "Δημήτρης": "Γίγαντες", "Αναστασία": "Τζατζίκι", "Κώστας": "Κοτόπουλο",
+            "Αθηνά": "Σπανακόπιτα", "Χρήστος": "Κεφτεδάκια", "Σοφία": "Πατάτες Φούρνου", "Μανώλης": "Σαγανάκι",
+            "Ιωάννα": "Μπριάμ", "Παναγιώτης": "Γαλακτομπούρεκο", "Νίκη": "Χορτόπιτα", "Θανάσης": "Γαρίδες",
+            "Ευαγγελία": "Καλαμαράκια", "Αλέξανδρος": "Παστίτσιο", "Δέσποινα": "Σουπιές", "Βασίλης": "Λαχανοντολμάδες"
+        }
+        self.scores = {f"{name} - {plate}": 0 for name, plate in self.participant_data.items()}
         self.player_votes = {}
         self.current_player = 1
 
@@ -38,11 +44,11 @@ class VotingApp:
 
         # Πεδίο καταχώρισης ψήφων
         self.entries = []
-        for plate in self.plates:
+        for name, plate in self.participant_data.items():
             frame = tk.Frame(self.voting_frame, bg="#2E2E2E")
             frame.pack(pady=5)  # Αυξημένο κενό μεταξύ των στοιχείων
 
-            label = tk.Label(frame, text=plate, width=20, anchor="w", fg="#FFFFFF", bg="#2E2E2E", font=("Ubuntu", 12))
+            label = tk.Label(frame, text=f"{name} - {plate}", width=30, anchor="w", fg="#FFFFFF", bg="#2E2E2E", font=("Ubuntu", 12))
             label.pack(side=tk.LEFT)
 
             entry = tk.Entry(frame, width=5, bg="#D5E8D4", font=("Ubuntu", 12))
@@ -62,10 +68,11 @@ class VotingApp:
         )
         self.submit_button.pack(pady=10)
 
-        # Πλαίσιο βαθμολογίας
+        # Πλαίσιο βαθμολογίας (ξεκινάει κρυφό)
         self.score_frame = tk.Frame(self.main_frame, relief=tk.SUNKEN, borderwidth=2, bg="#4CAF50", width=400, height=500)
         self.score_frame.pack_propagate(False)
         self.score_frame.pack(side=tk.LEFT, padx=10, fill=tk.BOTH, expand=True)
+        self.score_frame.pack_forget()
 
         self.score_label_title = tk.Label(self.score_frame, text="Scores", font=("Ubuntu", 16, "bold"), fg="#FFFFFF", bg="#4CAF50")
         self.score_label_title.pack(pady=10)
@@ -73,8 +80,6 @@ class VotingApp:
         self.score_text = tk.StringVar()
         self.score_label = tk.Label(self.score_frame, textvariable=self.score_text, font=("Ubuntu", 14), justify="left", fg="#FFFFFF", bg="#4CAF50", pady=5)
         self.score_label.pack(pady=10)
-
-        self.update_scores()
 
         # Κουμπί προβολής ψήφων
         self.view_button = tk.Button(
@@ -108,21 +113,22 @@ class VotingApp:
             messagebox.showerror("Error", "Please enter valid numbers.")
             return
 
-        if sorted(vote) != list(range(1, len(self.plates) + 1)):
+        if sorted(vote) != list(range(1, len(self.participant_data) + 1)):
             messagebox.showerror("Error", "Please rank all plates uniquely from 1 to 20.")
             return
 
         # Καταχώριση ψήφου
         self.player_votes[f"Player {self.current_player}"] = vote
-        for plate, rank in zip(self.plates, vote):
-            self.scores[plate] += rank
+        for (name, plate), rank in zip(self.participant_data.items(), vote):
+            self.scores[f"{name} - {plate}"] += rank
 
         # Αποθήκευση ψήφων σε αρχείο
         with open("votes.txt", "a") as file:
             file.write(f"Player {self.current_player}: {vote}\n")
 
-        # Ενημέρωση βαθμολογίας
+        # Ενημέρωση βαθμολογίας και εμφάνιση μόνο μετά την ψήφο
         self.update_scores()
+        self.score_frame.pack(side=tk.LEFT, padx=10, fill=tk.BOTH, expand=True)
 
         # Ενημέρωση παίκτη
         self.current_player += 1
@@ -133,6 +139,7 @@ class VotingApp:
             self.player_label.config(text=f"Player {self.current_player}")
             for entry in self.entries:
                 entry.delete(0, tk.END)
+            self.score_frame.pack_forget()
 
     def update_scores(self):
         sorted_scores = sorted(self.scores.items(), key=lambda x: x[1])
