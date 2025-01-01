@@ -5,6 +5,7 @@ class VotingApp:
     def __init__(self, master):
         self.master = master
         self.master.title("Voting UI")
+        self.master.configure(bg="#2E2E2E")  # Σκούρο φόντο για εορταστική αίσθηση
 
         # Αρχικοποίηση δεδομένων
         self.participants = 20
@@ -18,50 +19,87 @@ class VotingApp:
 
     def create_widgets(self):
         # Κύριο πλαίσιο
-        self.main_frame = tk.Frame(self.master)
+        self.main_frame = tk.Frame(self.master, bg="#2E2E2E")
         self.main_frame.pack(pady=10, padx=10)
 
         # Πλαίσιο ψηφοφορίας
-        self.voting_frame = tk.Frame(self.main_frame)
+        self.voting_frame = tk.Frame(self.main_frame, bg="#2E2E2E")
         self.voting_frame.pack(side=tk.LEFT, padx=10)
 
         # Ετικέτα για τον παίκτη
-        self.player_label = tk.Label(self.voting_frame, text=f"Player {self.current_player}", font=("Arial", 16))
+        self.player_label = tk.Label(
+            self.voting_frame,
+            text=f"Player {self.current_player}",
+            font=("Ubuntu", 16, "bold"),
+            fg="#FFFFFF",
+            bg="#2E2E2E"
+        )
         self.player_label.pack(pady=10)
 
         # Πεδίο καταχώρισης ψήφων
         self.entries = []
         for plate in self.plates:
-            frame = tk.Frame(self.voting_frame)
-            frame.pack(pady=2)
+            frame = tk.Frame(self.voting_frame, bg="#2E2E2E")
+            frame.pack(pady=5)  # Αυξημένο κενό μεταξύ των στοιχείων
 
-            label = tk.Label(frame, text=plate, width=20, anchor="w")
+            label = tk.Label(frame, text=plate, width=20, anchor="w", fg="#FFFFFF", bg="#2E2E2E", font=("Ubuntu", 12))
             label.pack(side=tk.LEFT)
 
-            entry = tk.Entry(frame, width=5)
+            entry = tk.Entry(frame, width=5, bg="#D5E8D4", font=("Ubuntu", 12))
             entry.pack(side=tk.LEFT)
+            entry.bind("<Down>", self.focus_next_entry)
+            entry.bind("<Up>", self.focus_previous_entry)
             self.entries.append(entry)
 
         # Κουμπί υποβολής
-        self.submit_button = tk.Button(self.voting_frame, text="Submit Vote", command=self.submit_vote)
+        self.submit_button = tk.Button(
+            self.voting_frame,
+            text="Submit Vote",
+            command=self.submit_vote,
+            bg="#FF5733",
+            fg="#FFFFFF",
+            font=("Ubuntu", 12, "bold")
+        )
         self.submit_button.pack(pady=10)
 
         # Πλαίσιο βαθμολογίας
-        self.score_frame = tk.Frame(self.main_frame, relief=tk.SUNKEN, borderwidth=2)
+        self.score_frame = tk.Frame(self.main_frame, relief=tk.SUNKEN, borderwidth=2, bg="#4CAF50", width=400, height=500)
+        self.score_frame.pack_propagate(False)
         self.score_frame.pack(side=tk.LEFT, padx=10, fill=tk.BOTH, expand=True)
 
-        self.score_label_title = tk.Label(self.score_frame, text="Scores", font=("Arial", 16))
+        self.score_label_title = tk.Label(self.score_frame, text="Scores", font=("Ubuntu", 16, "bold"), fg="#FFFFFF", bg="#4CAF50")
         self.score_label_title.pack(pady=10)
 
         self.score_text = tk.StringVar()
-        self.score_label = tk.Label(self.score_frame, textvariable=self.score_text, font=("Arial", 14), justify="left")
+        self.score_label = tk.Label(self.score_frame, textvariable=self.score_text, font=("Ubuntu", 14), justify="left", fg="#FFFFFF", bg="#4CAF50", pady=5)
         self.score_label.pack(pady=10)
 
         self.update_scores()
 
         # Κουμπί προβολής ψήφων
-        self.view_button = tk.Button(self.main_frame, text="View Votes", command=self.view_votes)
+        self.view_button = tk.Button(
+            self.main_frame,
+            text="View Votes",
+            command=self.view_votes,
+            bg="#FF5733",
+            fg="#FFFFFF",
+            font=("Ubuntu", 12, "bold")
+        )
         self.view_button.pack(side=tk.BOTTOM, pady=10)
+
+    def focus_next_entry(self, event):
+        widget = event.widget
+        index = self.entries.index(widget)
+        if index < len(self.entries) - 1:
+            self.entries[index + 1].focus()
+        return "break"
+
+    def focus_previous_entry(self, event):
+        widget = event.widget
+        index = self.entries.index(widget)
+        if index > 0:
+            self.entries[index - 1].focus()
+        return "break"
 
     def submit_vote(self):
         try:
