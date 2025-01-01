@@ -5,8 +5,8 @@ class VotingApp:
     def __init__(self, master):
         self.master = master
         self.master.title("Voting UI")
-        self.master.configure(bg="#2E2E2E")  # Σκούρο φόντο για εορταστική αίσθηση
-        self.master.geometry("900x600")  # Αύξηση διαστάσεων παραθύρου
+        self.master.configure(bg="#2E2E2E")
+        self.master.geometry("900x600")
 
         # Αρχικοποίηση δεδομένων
         self.participants = 20
@@ -26,7 +26,6 @@ class VotingApp:
             "Μαρία Όμορφη και Σταυρούλα": "Φωλίτσες",
             "Πάολα": "Σνιτσελόνια με Ντιπ",
             "Ελένη": "Μπισκοτίνια με Εσάνς... Μελομακάρονο"
-        
         }
         self.scores = {f"{name} - {plate}": 0 for name, plate in self.participant_data.items()}
         self.player_votes = {}
@@ -36,15 +35,12 @@ class VotingApp:
         self.create_widgets()
 
     def create_widgets(self):
-        # Κύριο πλαίσιο
         self.main_frame = tk.Frame(self.master, bg="#2E2E2E")
         self.main_frame.pack(pady=10, padx=10)
 
-        # Πλαίσιο ψηφοφορίας
         self.voting_frame = tk.Frame(self.main_frame, bg="#2E2E2E")
         self.voting_frame.pack(side=tk.LEFT, padx=20)
 
-        # Ετικέτα για τον παίκτη
         self.player_label = tk.Label(
             self.voting_frame,
             text=f"Player {self.current_player}",
@@ -52,16 +48,12 @@ class VotingApp:
             fg="#FFFFFF",
             bg="#2E2E2E"
         )
-        self.name_label.pack()
+        self.player_label.pack()
 
-        self.name_entry = tk.Entry(self.voting_frame, width=30, bg="#D5E8D4", font=("Ubuntu", 12))
-        self.name_entry.pack(pady=5)
-
-        # Πεδίο καταχώρισης ψήφων
         self.entries = []
         for name, plate in self.participant_data.items():
             frame = tk.Frame(self.voting_frame, bg="#2E2E2E")
-            frame.pack(pady=5)  # Αυξημένο κενό μεταξύ των στοιχείων
+            frame.pack(pady=5)
 
             label = tk.Label(frame, text=f"{name} - {plate}", width=30, anchor="w", fg="#FFFFFF", bg="#2E2E2E", font=("Ubuntu", 12))
             label.pack(side=tk.LEFT)
@@ -72,7 +64,6 @@ class VotingApp:
             entry.bind("<Up>", self.focus_previous_entry)
             self.entries.append(entry)
 
-        # Κουμπί υποβολής
         self.submit_button = tk.Button(
             self.voting_frame,
             text="Submit Vote",
@@ -83,7 +74,6 @@ class VotingApp:
         )
         self.submit_button.pack(pady=10)
 
-        # Πλαίσιο βαθμολογίας
         self.score_frame = tk.Frame(self.main_frame, relief=tk.SUNKEN, borderwidth=2, bg="#4CAF50", width=600, height=600)
         self.score_frame.pack_propagate(False)
         self.score_frame.pack(side=tk.LEFT, padx=10, fill=tk.BOTH, expand=True)
@@ -97,7 +87,6 @@ class VotingApp:
 
         self.update_scores()
 
-        # Κουμπί προβολής ψήφων
         self.view_button = tk.Button(
             self.main_frame,
             text="View Votes",
@@ -129,27 +118,19 @@ class VotingApp:
             messagebox.showerror("Error", "Please enter valid numbers.")
             return
 
-        if not all(1 <= v <= 10 for v in vote):
-            messagebox.showerror("Error", "Please enter numbers between 1 and 10.")
-            return
-
         if len(vote) != len(self.participant_data):
             messagebox.showerror("Error", "Please provide a score for every plate.")
             return
 
-        # Καταχώριση ψήφου
         self.player_votes[f"Player {self.current_player}"] = vote
         for (name, plate), rank in zip(self.participant_data.items(), vote):
             self.scores[f"{name} - {plate}"] += rank
 
-        # Αποθήκευση ψήφων σε αρχείο
         with open("votes.txt", "a") as file:
             file.write(f"Player {self.current_player}: {vote}\n")
 
-        # Ενημέρωση βαθμολογίας
         self.update_scores()
 
-        # Ενημέρωση παίκτη
         self.current_player += 1
         if self.current_player > self.participants:
             messagebox.showinfo("Voting Complete", "All participants have voted!")
@@ -167,9 +148,10 @@ class VotingApp:
         votes_text = "\n".join([f"{player}: {votes}" for player, votes in self.player_votes.items()])
         messagebox.showinfo("Player Votes", votes_text)
 
-# Εκκίνηση εφαρμογής
 if __name__ == "__main__":
     root = tk.Tk()
     app = VotingApp(root)
     root.mainloop()
+
+
 
