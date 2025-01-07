@@ -75,5 +75,5 @@ Feel free to fork this repository and submit pull requests for improvements or n
 ### License
 This project is licensed under the MIT License.
 
-Developed with ❤️ in Python.
+Developed with ❤️ in Python. Specifically designed for a Christmas gathering with the family!
 
